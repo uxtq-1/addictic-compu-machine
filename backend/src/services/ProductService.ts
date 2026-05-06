@@ -57,6 +57,18 @@ export class ProductService {
         throw new Error('Product limit reached (50 products max for Lite Professional plan)');
       }
 
+      // Check for duplicate SKU within the same cafeteria
+      if (data.sku) {
+        const existingProduct = await db('products')
+          .where('cafeteria_id', cafeteriaId)
+          .andWhere('sku', data.sku)
+          .first();
+
+        if (existingProduct) {
+          throw new Error('SKU already exists for this cafeteria');
+        }
+      }
+
       const productId = uuidv4();
       const productData = {
         id: productId,
@@ -184,6 +196,19 @@ export class ProductService {
     data: UpdateProductData
   ): Promise<Product> {
     try {
+      // Check for duplicate SKU within the same cafeteria (excluding current product)
+      if (data.sku) {
+        const existingProduct = await db('products')
+          .where('cafeteria_id', cafeteriaId)
+          .andWhere('sku', data.sku)
+          .andWhereNot('id', productId)
+          .first();
+
+        if (existingProduct) {
+          throw new Error('SKU already exists for this cafeteria');
+        }
+      }
+
       const updateData = {
         ...data,
         updated_at: db.fn.now(),
