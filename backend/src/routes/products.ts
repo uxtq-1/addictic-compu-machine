@@ -172,9 +172,6 @@ router.post('/:id/image', [
     });
   }
 
-  // Validate the uploaded file
-  StorageService.validateImageUpload(req.file);
-
   // Upload the image
   const uploadResult = await StorageService.uploadProductImage(
     req.file.buffer,
@@ -197,6 +194,43 @@ router.post('/:id/image', [
       product,
       image: uploadResult,
     },
+    timestamp: new Date(),
+  });
+}));
+
+// DELETE /products/:id/image - Delete product image (Owner/Admin only)
+router.delete('/:id/image', [
+  param('id').isUUID().withMessage('Invalid product ID'),
+], handleValidationErrors, requireRole(['owner', 'admin']), asyncHandler(async (req, res) => {
+  // Get the current product to find the image URL
+  const product = await ProductService.getProductById(req.params.id);
+
+  if (!product.image_url) {
+    return res.status(404).json({
+      success: false,
+      error: 'No image found for this product',
+      statusCode: 404,
+    });
+  }
+
+  // Extract filename from URL
+  const urlParts = product.image_url.split('/');
+  const filename = urlParts.slice(-3).join('/'); // cafeterias/id/products/id/filename
+
+  // Delete the image from storage
+  await StorageService.deleteProductImage(filename, req.cafeteriaId!);
+
+  // Update the product to remove the image URL
+  const updatedProduct = await ProductService.updateProduct(
+    req.params.id,
+    req.cafeteriaId!,
+    req.userId!,
+    { image_url: null }
+  );
+
+  res.json({
+    success: true,
+    data: updatedProduct,
     timestamp: new Date(),
   });
 }));

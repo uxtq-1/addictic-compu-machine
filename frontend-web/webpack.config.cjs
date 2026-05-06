@@ -1,6 +1,8 @@
 const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
+const TsconfigPathsPlugin = require('tsconfig-paths-webpack-plugin');
+const webpack = require('webpack');
 
 const isDevelopment = process.env.NODE_ENV !== 'production';
 
@@ -15,9 +17,7 @@ module.exports = {
   },
   resolve: {
     extensions: ['.tsx', '.ts', '.js', '.jsx'],
-    alias: {
-      '@': path.resolve(__dirname, 'src'),
-    },
+    plugins: [new TsconfigPathsPlugin()],
   },
   devtool: isDevelopment ? 'cheap-module-source-map' : 'source-map',
   module: {
@@ -58,6 +58,9 @@ module.exports = {
     }),
     new MiniCssExtractPlugin({
       filename: isDevelopment ? 'styles.css' : 'styles.[contenthash].css',
+    }),
+    new webpack.DefinePlugin({
+      'process.env': JSON.stringify(process.env),
     }),
   ],
   devServer: {

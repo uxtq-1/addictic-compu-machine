@@ -1,4 +1,7 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { signIn } from '../services/auth';
+import { useAuthStore } from '../store/authStore';
 
 interface LoginFormProps {
   onLogin?: (email: string, password: string) => void;
@@ -9,6 +12,8 @@ export const LoginPage: React.FC<LoginFormProps> = ({ onLogin }) => {
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const navigate = useNavigate();
+  const { setUser } = useAuthStore();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -16,12 +21,11 @@ export const LoginPage: React.FC<LoginFormProps> = ({ onLogin }) => {
     setLoading(true);
 
     try {
-      if (onLogin) {
-        await onLogin(email, password);
-      }
-      // TODO: Implement Firebase Auth integration
-    } catch (err) {
-      setError('Login failed. Please try again.');
+      const user = await signIn(email, password);
+      setUser(user);
+      navigate('/dashboard');
+    } catch (err: any) {
+      setError(err.message || 'Login failed. Please try again.');
       console.error(err);
     } finally {
       setLoading(false);

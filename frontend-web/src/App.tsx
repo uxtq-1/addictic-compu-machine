@@ -1,25 +1,46 @@
 import React from 'react';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { LoginPage } from './pages/LoginPage';
 import { Dashboard } from './pages/Dashboard';
+import { useAuthStore } from './store/authStore';
+import { onAuthStateChange } from './services/auth';
 
-// TODO: Implement proper routing with react-router
-const App = () => {
-  const [isLoggedIn, setIsLoggedIn] = React.useState(false);
+const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const { isAuthenticated, isLoading } = useAuthStore();
 
-  const handleLogin = (email: string, password: string) => {
-    // TODO: Integrate with Firebase Auth
-    console.log('Login attempt:', email);
-    setIsLoggedIn(true);
-  };
+  if (isLoading) {
+    return <div>Loading...</div>;
+  }
+
+  return isAuthenticated ? <>{children}</> : <Navigate to="/login" replace />;
+};
+
+const App: React.FC = () => {
+  const { setUser, setLoading } = useAuthStore();
+
+  React.useEffect(() => {
+    setLoading(true);
+    const unsubscribe = onAuthStateChange((user) => {
+      setUser(user);
+    });
+    return unsubscribe;
+  }, [setUser, setLoading]);
 
   return (
-    <div>
-      {isLoggedIn ? (
-        <Dashboard />
-      ) : (
-        <LoginPage onLogin={handleLogin} />
-      )}
-    </div>
+    <Router>
+      <Routes>
+        <Route path="/login" element={<LoginPage />} />
+        <Route
+          path="/dashboard"
+          element={
+            <ProtectedRoute>
+              <Dashboard />
+            </ProtectedRoute>
+          }
+        />
+        <Route path="/" element={<Navigate to="/dashboard" replace />} />
+      </Routes>
+    </Router>
   );
 };
 

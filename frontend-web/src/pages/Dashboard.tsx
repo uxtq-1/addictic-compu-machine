@@ -1,6 +1,22 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
+import { logout } from '../services/auth';
+import { useAuthStore } from '../store/authStore';
 
 export const Dashboard: React.FC = () => {
+  const navigate = useNavigate();
+  const { logout: logoutStore } = useAuthStore();
+
+  const handleLogout = async () => {
+    try {
+      await logout();
+      logoutStore();
+      navigate('/login');
+    } catch (error) {
+      console.error('Logout failed:', error);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gray-100">
       {/* Navigation */}
@@ -12,7 +28,12 @@ export const Dashboard: React.FC = () => {
             </div>
             <div className="flex items-center space-x-4">
               <button className="text-gray-600 hover:text-gray-900">Settings</button>
-              <button className="text-gray-600 hover:text-gray-900">Logout</button>
+              <button
+                onClick={handleLogout}
+                className="text-gray-600 hover:text-gray-900"
+              >
+                Logout
+              </button>
             </div>
           </div>
         </div>
