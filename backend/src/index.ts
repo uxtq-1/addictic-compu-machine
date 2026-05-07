@@ -14,7 +14,7 @@ import { db } from './utils/database';
 // import authRoutes from './routes/auth';
 import productRoutes from './routes/products';
 import categoryRoutes from './routes/categories';
-// import orderRoutes from './routes/orders';
+import orderRoutes from './routes/orders';
 
 const app: Express = express();
 const port = process.env.PORT || 3000;
@@ -67,7 +67,7 @@ app.get('/health', (req: Request, res: Response) => {
 // app.use('/products', authMiddleware, productRoutes);
 app.use('/products', optionalAuthMiddleware, productRoutes);
 app.use('/categories', optionalAuthMiddleware, categoryRoutes);
-// app.use('/orders', authMiddleware, orderRoutes);
+app.use('/orders', optionalAuthMiddleware, orderRoutes);
 
 // Error handling
 app.use(errorHandler);
