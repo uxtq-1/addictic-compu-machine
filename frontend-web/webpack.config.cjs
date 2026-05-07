@@ -3,8 +3,24 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const TsconfigPathsPlugin = require('tsconfig-paths-webpack-plugin');
 const webpack = require('webpack');
+const dotenv = require('dotenv');
+
+// Load environment variables from .env file
+const envFile = path.resolve(__dirname, '.env');
+const envConfig = dotenv.config({ path: envFile });
+const env = envConfig.parsed || {};
 
 const isDevelopment = process.env.NODE_ENV !== 'production';
+
+// Build the env object for DefinePlugin - only include REACT_APP_ variables
+const envVariables = {};
+Object.keys(env).forEach((key) => {
+  if (key.startsWith('REACT_APP_')) {
+    envVariables[`process.env.${key}`] = JSON.stringify(env[key]);
+  }
+});
+// Add NODE_ENV
+envVariables['process.env.NODE_ENV'] = JSON.stringify(isDevelopment ? 'development' : 'production');
 
 module.exports = {
   mode: isDevelopment ? 'development' : 'production',
@@ -59,9 +75,7 @@ module.exports = {
     new MiniCssExtractPlugin({
       filename: isDevelopment ? 'styles.css' : 'styles.[contenthash].css',
     }),
-    new webpack.DefinePlugin({
-      'process.env': JSON.stringify(process.env),
-    }),
+    new webpack.DefinePlugin(envVariables),
   ],
   devServer: {
     static: {
