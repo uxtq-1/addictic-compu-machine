@@ -1,0 +1,48 @@
+{
+  "name": "cafeteria-lite-professional-web",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "webpack serve --config webpack.config.cjs --mode development",
+    "build": "webpack --config webpack.config.cjs --mode production",
+    "preview": "serve -s dist",
+    "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
+    "type-check": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@stripe/react-stripe-js": "^2.4.0",
+    "@stripe/stripe-js": "^1.46.0",
+    "axios": "^1.6.5",
+    "firebase": "^10.7.0",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-hot-toast": "^2.4.1",
+    "react-router-dom": "^6.20.0",
+    "recharts": "^2.10.0",
+    "zustand": "^4.4.5"
+  },
+  "devDependencies": {
+    "@types/node": "^25.6.0",
+    "@types/react": "^18.2.37",
+    "@types/react-dom": "^18.2.15",
+    "@typescript-eslint/eslint-plugin": "^6.13.2",
+    "@typescript-eslint/parser": "^6.13.2",
+    "autoprefixer": "^10.4.19",
+    "css-loader": "^6.9.4",
+    "dotenv": "^17.4.2",
+    "eslint": "^8.54.0",
+    "html-webpack-plugin": "^5.5.3",
+    "mini-css-extract-plugin": "^2.8.0",
+    "postcss": "^8.4.37",
+    "postcss-loader": "^8.2.1",
+    "serve": "^14.2.0",
+    "tailwindcss": "^3.4.4",
+    "ts-loader": "^9.4.4",
+    "tsconfig-paths-webpack-plugin": "^4.2.0",
+    "typescript": "^5.2.2",
+    "webpack": "^5.89.0",
+    "webpack-cli": "^5.1.4",
+    "webpack-dev-server": "^4.15.1"
+  }
+}
